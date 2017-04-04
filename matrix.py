@@ -16,12 +16,28 @@
 # along with this file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from fractions import Frac
+
 class Matrix:
-    """ A representation of a matrix """
+    """
+    A representation of a matrix
+
+    Note: Rows and column start at number 1 instead of 0.
+
+    Example:
+
+        [ 1 2 3 ]
+    A = [ 2 3 4 ]
+        [ 5 6 7 ]
+
+    A.read(1, 1) = 1
+    A.read(2, 2) = 3
+    A.read(3, 3) = 7
+    """
 
     def __init__(self, list_rep):
         """ (Matrix, list) -> NoneType
-        Initializes the matrix
+        Initializes the matrix.
         """
         # list to store the matrix information
         self._data = []
@@ -45,7 +61,16 @@ class Matrix:
         """ (SquareMatrix) -> SquareMatrix
         Return a copy of self
         """
-        return SquareMatrix(self._data)
+        my_copy = SquareMatrix(self._data)
+
+        # create copy of fraction
+        for i in range(1, self.get_size()[0] + 1):
+            for j in range(1, self.get_size()[0] + 1):
+                value = my_copy.read(i, j)
+                if isinstance(value, Frac):
+                    my_copy.write(i,j, value.copy())
+
+        return my_copy
 
     def get_size(self):
         """ (Matrix) -> tuple of (int, int)
@@ -165,11 +190,15 @@ class SquareMatrix(Matrix):
         # dummy var for output
         determinant = 0
 
+        # if self is 1x1 matrix:
+        if self.get_size() == (1, 1):
+            determinant = self.read(1, 1)
+
         # if self is a 2x2 matrix:
-        if self.get_size() == (2, 2):
+        elif self.get_size() == (2, 2):
             # use the formula to get determinant
-            determinant = (self.read(1, 1) * self.read(2, 2) -
-                           self.read(1, 2) * self.read(2, 1))
+            determinant = ((self.read(1, 1) * self.read(2, 2)) -
+                           (self.read(1, 2) * self.read(2, 1)))
 
         # if self is larger than 2x2:
         else:
@@ -188,7 +217,8 @@ class SquareMatrix(Matrix):
                     minor_det = minor.det()
 
                     # add to the determinant
-                    determinant += a_1i * (-1)**(1 + i) * minor_det
+                    determinant += (-1)**(1 + i) * a_1i *  minor_det
+
 
         return determinant
 
@@ -258,7 +288,7 @@ def adjoint(A):
             for j in range(1, size + 1):
 
                 # calculate the determinant of the minor matrix ij
-                minor_det = (-1)**(i + j) * A.minor(i, j).det()
+                minor_det = A.minor(i, j).det() * (-1)**(i + j)
 
                 # put it in the adjoint list
                 adjoint_list[i - 1].append(minor_det)
@@ -282,8 +312,8 @@ def inverse(A):
     # get adjoint of A
     adjoint = adjoint(A)
 
-    # calculate the reciprocal of A.det()
-    factor = 1 / A.det()
+    # get reciprocal of A
+    detA = Frac(1, A.det())
 
     return adjoint.scalar_multiply(factor)
 
@@ -330,7 +360,7 @@ def cramer(A, b):
 
             # calculate the solution according to
             # Cramer's rule
-            solutions.add(B_i.det() / a_det)
+            solutions.add(str(Frac(B_i.det(), a_det)))
 
     return solutions
 
@@ -339,4 +369,11 @@ if __name__ == "__main__":
     one = SquareMatrix([[1, 2, 1], [-3, 1, -2], [2, 3, -1]])
 
     two = SquareMatrix([[1, 3, -2], [0, 1, 5], [-2, -6, 7]])
-    print(adjoint(two))
+    #print(adjoint(two))
+
+    a = SquareMatrix([[1, 2, 3],
+                      [2, Frac(1, 2), 4],
+                      [5, 7, 9]])
+    print(a)
+    print(a.det())
+    print(cramer(a, [1, 2, 3]))
