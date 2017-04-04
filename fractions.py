@@ -78,8 +78,6 @@ class Frac:
 
     def __rmul__(self, value, simplify=True):
         """ (Frac, Frac or int) -> NoneType
-        Multiply the fraction with another fraction or integer.
-
         Returns self * value
         """
         # if multiply value is int
@@ -97,10 +95,6 @@ class Frac:
 
     def __radd__(self, value, simplify=True):
         """ (Frac, Frac or int) -> NoneType
-        Adds the fractions together. Use the naive way. Make
-        common denominator by multiplying both together,
-        and simplifying after.
-
         Returns self + value
         """
         # if value is int, then make a Frac out of it
@@ -118,18 +112,13 @@ class Frac:
 
     def __rsub__(self, value, simplify=True):
         """ (Frac, Frac or int) -> NoneType
-        Subtracts the fractions together. Use the naive way.
+        Returns self - value
         """
         self.__radd__(value.neg(), simplify)
 
-    def __rtruediv__(self, value, simplify=True):
+    def __div__(self, value, simplify=True):
         """ (Frac, Frac or int) -> NoneType
-        Divide the fraction with another fraction or integer.
-
-        Note that division is just multiplying the recipricol
-        of ``value``.
-
-        Use Frac() / Frac()
+        Returns self / value
         """
         # case for integer
         if isinstance(value, int):
