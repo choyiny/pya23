@@ -56,11 +56,11 @@ class Frac:
         Simplifies the fraction
         """
         # calculate gcd
-        gcd = gcd(_num, _denom)
+        the_gcd = gcd(self._num, self._denom)
 
         # divide by gcd, keep integer
-        self._num = self._num // gcd
-        self._denom = self._denom // gcd
+        self._num = self._num // the_gcd
+        self._denom = self._denom // the_gcd
 
 
     def neg(self):
@@ -76,7 +76,7 @@ class Frac:
         return ((self._num == other.num) and
                 (self._denom == other._denom))
 
-    def __rmul__(self, value, simplify=True):
+    def __mul__(self, value, simplify=True):
         """ (Frac, Frac or int) -> NoneType
         Returns self * value
         """
@@ -93,7 +93,7 @@ class Frac:
         # create new fraction and return
         return Frac(num, denom, simplify)
 
-    def __radd__(self, value, simplify=True):
+    def __add__(self, value, simplify=True):
         """ (Frac, Frac or int) -> NoneType
         Returns self + value
         """
@@ -101,16 +101,20 @@ class Frac:
         if isinstance(value, int):
             value = Frac(value, 1)
 
-        # multiply denominator
-        denom = self._denom * value._denom
+        # find gcd
+        the_gcd = gcd(self._denom, value._denom)
+
+        # multiply denominator and divide
+        # by gcd
+        denom = self._denom * value._denom // the_gcd
 
         # find numerator
-        num = (self._num * value._denom +
-                     value._num * self._denom)
+        num = (self._num * value._denom // the_gcd +
+               value._num * self._denom // the_gcd)
 
         return Frac(num, denom, simplify)
 
-    def __rsub__(self, value, simplify=True):
+    def __sub__(self, value, simplify=True):
         """ (Frac, Frac or int) -> NoneType
         Returns self - value
         """
